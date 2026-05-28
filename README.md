@@ -2,44 +2,114 @@
 
 ## Overview
 
-This is a Django REST + React prototype for ingesting ESG activity data from three sources:
+This project is a Django REST + React prototype for ingesting ESG activity data from multiple enterprise source systems.
+The application supports ingestion, normalization, review, approval, and audit locking of ESG-related activity records.
+
+Supported ingestion sources:
 
 1. SAP fuel/procurement CSV
 2. Utility electricity CSV
 3. Corporate travel CSV
 
-The system normalizes rows, flags suspicious records, and lets analysts approve and lock records for audit.
+The system parses uploaded CSV files, stores raw rows for auditability, converts records into normalized activity records, flags suspicious data, and provides an analyst review workflow through a React dashboard.
 
-## Features
+---
 
-- CSV upload
-- Source-specific parsers
-- Raw source row storage
-- Normalized activity records
-- Scope 1, Scope 2, Scope 3 mapping
-- Suspicious row flags
-- Analyst approval
-- Audit locking
-- React review dashboard
+# Features
 
-## Backend Setup
+* CSV upload workflow
+* Source-specific ingestion parsers
+* Raw source row preservation
+* Normalized ESG activity records
+* Scope 1 / Scope 2 / Scope 3 classification
+* Suspicious record detection
+* Analyst approval workflow
+* Audit locking workflow
+* Multi-source ingestion support
+* React review dashboard
+* REST API backend
+* Deployment on Render + Netlify
 
+---
+
+# Tech Stack
+
+## Backend
+
+* Python
+* Django
+* Django REST Framework
+* SQLite (local development)
+* PostgreSQL (production)
+* WhiteNoise
+* Gunicorn
+
+## Frontend
+
+* React
+* Vite
+* Axios
+* CSS
+
+## Deployment
+
+* Render (Backend)
+* Netlify (Frontend)
+
+# Backend Setup
+
+## 1. Navigate to backend
 ```bash
 cd backend
-.\venv\Scripts\activate
-python manage.py migrate
-python manage.py seed
-python manage.py runserver
-
-
-## Frontend Setup
-
+```
+## 2. Create virtual environment
 ```bash
-cd frontend
-npm install
-npm run dev
+python -m venv venv
+```
+## 3. Activate virtual environment
+### Windows
+```bash
+.\venv\Scripts\activate
+```
+## 4. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+## 5. Run migrations
+```bash
+python manage.py migrate
+```
+## 6. Seed initial data
+```bash
+python manage.py seed
+```
+## 7. Start backend server
+```bash
+python manage.py runserver
 ```
 
+Backend runs on:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+# Frontend Setup
+
+## 1. Navigate to frontend
+```bash
+cd frontend
+```
+## 2. Install dependencies
+```bash
+npm install
+```
+## 3. Start frontend server
+```bash
+npm run dev
+```
 Frontend runs on:
 
 ```text
@@ -48,9 +118,9 @@ http://localhost:5173
 
 ---
 
-## Sample Data
+# Sample Data
 
-Sample CSVs are available in:
+Sample CSV files are located in:
 
 ```text
 sample_data/
@@ -60,102 +130,154 @@ Files:
 
 * sap_fuel.csv
 * utility_electricity.csv
-* travel_data.csv
+* travel.csv
 
 ---
 
-## Deployment
+# Deployment
 
-### Frontend (Netlify)
+## Frontend (Netlify)
 
-Live URL:
+Live Frontend URL:
 
 ```text
 https://melodious-caramel-879d00.netlify.app
 ```
 
-### Backend (Render)
+## Backend (Render)
 
-API Base URL:
+Backend API URL:
 
 ```text
-https://breathe-esg-backend.onrender.com/api/activities/
+https://breathe-esg-1-h9ib.onrender.com/api
 ```
 
 ---
 
-## Architecture
+# Architecture
 
-### Backend
+## Backend Architecture
 
-* Django REST Framework
-* SQLite (local)
-* PostgreSQL (production)
-* CSV ingestion services
-* Multi-tenant data model
-* Audit trail support
+The backend uses Django REST Framework for API development.
 
-### Frontend
+Core components:
 
-* React + Vite
-* Axios API integration
-* Analyst review dashboard
-* Upload workflow
+* ingestion services
+* source-specific parsers
+* normalization pipeline
+* suspicious flag generation
+* audit tracking
+* analyst workflow endpoints
 
----
+### Main Models
 
-## Analyst Workflow
-
-1. Upload CSV source file
-2. System parses and normalizes rows
-3. Suspicious records are flagged
-4. Analyst reviews records
-5. Analyst approves rows
-6. Approved rows can be locked for audit
+* Tenant
+* Site
+* SourceSystem
+* IngestionRun
+* RawRecord
+* ActivityRecord
+* ReviewDecision
+* AuditEvent
 
 ---
 
-## API Endpoints
+## Frontend Architecture
 
-### Upload CSV
+The frontend is built using React + Vite.
+
+Features include:
+
+* CSV upload interface
+* activity review table
+* suspicious flag visualization
+* summary dashboard cards
+* approve/lock actions
+* API integration using Axios
+
+---
+
+# ESG Workflow
+
+## Upload Workflow
+
+1. Analyst uploads CSV file
+2. Backend parser processes source-specific schema
+3. Raw source rows stored in database
+4. Records normalized into ActivityRecord objects
+5. Suspicious rows flagged automatically
+6. Analyst reviews records
+7. Approved records can be locked for audit
+
+---
+
+# API Endpoints
+
+## Upload CSV
 
 ```text
 POST /api/upload/
 ```
 
-### List Activities
+Uploads and processes CSV source files.
+
+---
+
+## List Activities
 
 ```text
 GET /api/activities/
 ```
 
-### Approve Record
+Returns normalized activity records.
+
+---
+
+## Approve Record
 
 ```text
 POST /api/activities/<id>/approve/
 ```
 
-### Lock Record
+Approves an activity record.
+
+---
+
+## Lock Record
 
 ```text
 POST /api/activities/<id>/lock/
 ```
 
+Locks approved records for audit purposes.
+
 ---
 
-## Production Notes
+# Suspicious Record Detection
 
-This prototype focuses on:
+The system flags suspicious rows for analyst review.
 
-* realistic ingestion flows
-* auditability
-* normalization
-* analyst review workflow
+Examples:
 
-Not implemented:
+* negative quantities
+* missing values
+* unknown site codes
+* unusually large electricity usage
+* abnormal travel distances
+* long billing periods
 
-* authentication
-* async processing
-* large-scale file handling
-* real SAP/API integrations
-* production-grade emissions factor engine
+Suspicious rows remain reviewable by analysts before approval.
+
+# Deployment Notes
+
+The backend is deployed on Render using:
+
+* Gunicorn
+* PostgreSQL
+* WhiteNoise
+
+The frontend is deployed on Netlify and communicates with the Render backend API.
+
+---
+
+
