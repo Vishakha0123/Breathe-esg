@@ -1,0 +1,4 @@
+meter_id,site_code,billing_start,billing_end,kwh,tariff,peak_kw
+MTR-001,PL01,2026-01-15,2026-02-14,42000,HT Industrial,120
+MTR-002,PL02,2026-01-01,2026-03-15,91000,Commercial,210
+MTR-003,UNKNOWN,2026-02-01,2026-02-28,,Commercial,80
